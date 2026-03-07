@@ -1,0 +1,7 @@
+ultralytics
+opencv-python-headless
+numpy
+# The following are hardware-specific but included for completion
+# They may fail to install or work on non-Pi systems
+# gpiozero
+# picamera2
