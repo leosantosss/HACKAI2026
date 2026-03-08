@@ -45,11 +45,13 @@ class SegFormerDetector:
             'stair':    (0, 200, 200),   # Teal
             'person':   (60, 20, 220),   # Red
             'car':      (0, 0, 142),     # Blue
+            'wall':     (120, 120, 120), # Grey
+            'door':     (150, 100, 50),  # Brown
+            'void':     (200, 150, 200), # Light Violet (For indoor floors)
         }
         for cls_id, label in self.id2label.items():
             l_lower = label.lower()
             for key, color in class_colors.items():
-                # Avoid "caravan" being colorized as "car"
                 if key == "car" and "caravan" in l_lower: continue
                 if key in l_lower:
                     self.palette[int(cls_id)] = color
@@ -128,37 +130,55 @@ class SegFormerDetector:
         return mask, detections
 
     def analyze_hazards(self, mask):
-        """Analyze bottom center zone for curbs and stairs to ensure we are walking TOWARDS them."""
+        """Analyze bottom center zone for curbs/stairs. Uses EMA to only alert if hazard is GROWING/APPROACHING."""
         h, w = mask.shape
         hazard_h = int(h * config.HAZARD_ZONE_HEIGHT)
         
-        # Center the hazard detection to the approach zone (only alert if in path)
         margin = (1.0 - config.APPROACH_ZONE) / 2
         left_bound = int(w * margin)
         right_bound = int(w * (1 - margin))
         
         roi = mask[h - hazard_h:h, left_bound:right_bound]
         
-        # 1. Check for Curbs
         curb_pixels = np.isin(roi, self.nav_map['curb']).sum()
-        # 2. Check for Stairs
         stair_pixels = np.isin(roi, self.nav_map['stair']).sum()
         
-        alerts = []
-        # Threshold is relative to ROI size now
         roi_size = roi.size
         stair_density = stair_pixels / roi_size
         curb_density = curb_pixels / roi_size
         
-        # We use a lower pixel count threshold since the ROI is smaller now, 
-        # or we can switch to a density threshold. Let's keep pixels but scale it.
-        min_pixels = config.CURB_STAIR_MIN_PIXELS * config.APPROACH_ZONE 
+        min_density_threshold = (config.CURB_STAIR_MIN_PIXELS * config.APPROACH_ZONE) / roi_size
         
-        if stair_pixels > min_pixels:
-            alerts.append({'type': 'stair', 'confidence': float(stair_density)})
-        elif curb_pixels > min_pixels:
-            alerts.append({'type': 'curb', 'confidence': float(curb_density)})
+        alerts = []
+        
+        # Track history dynamically
+        if not hasattr(self, 'hazard_history'):
+            self.hazard_history = {'stair': deque(maxlen=5), 'curb': deque(maxlen=5)}
+            self.hazard_emas = {'stair': 0.0, 'curb': 0.0}
             
+        alpha = config.APPROACH_EMA_ALPHA
+            
+        for hazard_type, current_density in [('stair', stair_density), ('curb', curb_density)]:
+            if current_density > min_density_threshold:
+                # Update EMA
+                prev_ema = self.hazard_emas[hazard_type]
+                current_ema = (alpha * current_density) + ((1 - alpha) * prev_ema)
+                self.hazard_emas[hazard_type] = current_ema
+                
+                hist = self.hazard_history[hazard_type]
+                hist.append(current_ema)
+                
+                # We need a few frames to confirm it's actually approaching
+                if len(hist) >= 3:
+                    is_growing = hist[-1] > hist[0]
+                    # Only alert if the density is getting larger (getting closer)
+                    if is_growing:
+                        alerts.append({'type': hazard_type, 'confidence': float(current_ema)})
+            else:
+                # Clear history if nothing is there to avoid stale data
+                self.hazard_history[hazard_type].clear()
+                self.hazard_emas[hazard_type] = 0.0
+                
         return alerts
 
     def check_safe_path(self, mask):

@@ -14,8 +14,12 @@ SAFE_PATH_MIN_DENSITY = 0.6      # % of center path that must be "sidewalk/road"
 CURB_STAIR_MIN_PIXELS = 1000     # Minimum pixel count in hazard zone to trigger alert
 HAZARD_ZONE_HEIGHT = 0.25        # Bottom % of frame to analyze for curbs/stairs
 
+# Performance (Hackathon Speed Mode)
+FRAME_SKIP = 2                   # Only run AI every N frames (2-3 recommended for Pi)
+DETECTION_SIZE = 256             # Resize AI input to this square size (128-512)
+
 # Detection zones
-APPROACH_ZONE = 0.5              # center fraction of frame that counts as "in path"
+APPROACH_ZONE = 0.35             # center fraction of frame that counts as "in path"
 
 # Sensitivities
 APPROACH_SENSITIVITY = 0.12      

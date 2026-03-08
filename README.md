@@ -1,67 +1,61 @@
-# 🚀 Vizzion (Raspberry Pi 5)
+# Vizzion: AI-Powered Spatial Awareness for the Visually Impaired
 
-This guide helps you move the project from your Mac to your Raspberry Pi 5 using an SD card or external SSD.
+Vizzion is a real-time assistive navigation system that translates the visual world into intuitive haptic feedback. By combining state-of-the-art semantic segmentation with intelligent temporal tracking, Vizzion identifies safe paths, structural hazards, and rapidly approaching threats to empower independent mobility.
 
-## Architecture
-<img width="681" height="448" alt="Screenshot 2026-03-07 at 5 39 54 PM" src="https://github.com/user-attachments/assets/4b8aa216-da86-499c-bec5-3d2cf8ec61dd" />
+## 🚀 Key Features
 
+*   **Pixel-Level Scene Understanding:** Utilizes a fine-tuned **SegFormer-B0** model to distinguish between sidewalks, roads, curbs, and stairs with high precision.
+*   **Intelligent Approach Tracking:** Implements an **Exponential Moving Average (EMA)** growth algorithm to detect "object growth," alerting users only when a threat (like a car or person) is actively moving toward them.
+*   **Stateful Hazard Detection:** Specifically engineered to detect structural drops (curbs) and inclines (stairs) that traditional ultrasonic sensors often miss.
+*   **Prioritized Haptic Feedback:** Translates visual intensity into hardware vibrations. The system prioritizes immediate hazards (stairs/curbs) over general obstacles to ensure the user receives the most critical information first.
+*   **Hardware Accelerated:** Optimized for **Raspberry Pi 5** and local GPUs (**Apple Silicon MPS / NVIDIA CUDA**), achieving 30+ FPS for real-time safety.
 
+## 🛠️ Built With
 
-## 1. Prepare your OS
-Use **Raspberry Pi Imager** to flash **Raspberry Pi OS (64-bit) Bookworm** onto your card/drive.
-- **IMPORTANT**: In the "OS Customization" settings, enable **SSH** and set up your **Wi-Fi** so you can connect to it easily.
+**Python**, **PyTorch**, **SegFormer**, **Hugging Face Transformers**, **OpenCV**, **NumPy**, **Pandas**, **Roboflow**, **Google Colab**, **Raspberry Pi 5**, **Metal Performance Shaders (MPS)**, **CUDA**, and **GitHub**.
 
-## 2. Copy the Files
-Since Mac cannot natively write to the Linux (ext4) partition of the SD card, the best ways to get the code over are:
+---
 
-### Option A: Via Network (Recommended)
-Once the Pi is booted and connected to your Wi-Fi:
+## 💻 Tech Stack Depth
+
+### The AI Brain
+We fine-tuned a **SegFormer-B0** encoder-decoder architecture on a custom-curated street navigation dataset. Unlike standard object detection, this allows Vizzion to "see" the safe walking area (sidewalk) and identify the exact boundaries of structural hazards like curbs.
+
+### The Logic Engine
+To prevent "beeper fatigue," we developed a temporal filter that calculates the change in an object's area over time. By tracking the **growth rate**, the system can distinguish between a person standing still and a vehicle approaching at speed.
+
+---
+
+## 🔌 Hardware Setup
+
+*   **Processor:** Raspberry Pi 5 (or Mac/PC for development)
+*   **Camera:** Raspberry Pi Camera Module 3 or any USB Webcam
+*   **Haptics:** Piezo buzzer or vibration motor connected to **GPIO 18** (PWM)
+
+---
+
+## 🏃 Getting Started
+
+### 1. Install Dependencies
 ```bash
-# From your Mac terminal
-scp -r ~/Documents/HACK_AI pi@raspberrypi.local:~/Vizzion
+pip install torch transformers opencv-python pillow numpy roboflow
 ```
 
-### Option B: Via GitHub (Best for updates)
-1. Create a new repository on [GitHub](https://github.com/new).
-2. On your **Mac**, push the code:
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit"
-   git branch -M main
-   git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
-   git push -u origin main
-   ```
-3. On your **Pi**, clone it:
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git ~/Vizzion
-   ```
+### 2. Configure
+Adjust thresholds and performance settings in `config.py`.
+*   `FRAME_SKIP`: Set to `2` or `3` for smoother performance on low-power devices.
+*   `APPROACH_ZONE`: Define the horizontal width of your "safe path."
 
-### Option C: Via the 'boot' partition (The "Sneakernet" way)
-1. Plug your flashed SD card into your Mac.
-2. Open the volume named `bootfs`.
-3. Create a folder called `Vizzion` and copy all these files into it.
-4. Plug the card into your Pi and boot it.
-5. Once logged in, move the folder:
-   ```bash
-   mv /boot/firmware/Vizzion ~/Vizzion
-   ```
-
-## 3. Setup on the Pi
-Run these commands once you are on the Pi terminal:
-```bash
-cd ~/Vizzion
-python -m venv .venv --system-site-packages
-source .venv/bin/activate
-pip install ultralytics opencv-python-headless numpy
-```
-
-## 4. Hardware Wiring
-- **Camera**: Connect to CSI port (Ribbon cable).
-- **Buzzer (+)**: GPIO 18 (PWM).
-- **Buzzer (-)**: GND.
-
-## 5. Launch
+### 3. Run
 ```bash
 python main.py
 ```
+
+## 📈 Performance Tip
+If the system feels laggy on your hardware, enable **Hackathon Speed Mode** by adjusting these values in `config.py`:
+- `FRAME_SKIP = 2`
+- `SHOW_DISPLAY = False` (for maximum headless performance)
+
+---
+
+*Developed during the 2026 AI Hackathon by Leo Santos.*

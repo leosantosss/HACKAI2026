@@ -16,22 +16,23 @@ def test_on_dataset():
     print("Initializing VisionAgent with fine-tuned model...")
     agent = VisionAgent()
     
-    PARQUET_FILE = "train-00000-of-00001.parquet"
-    print(f"Reading {PARQUET_FILE}...")
-    df = pd.read_parquet(PARQUET_FILE)
+    import os
+    from glob import glob
     
-    print("\nStarting Pipeline Test.")
+    # Switch to unseen test images
+    TEST_DIR = "vizzion-1/test"
+    print(f"Reading images from {TEST_DIR}...")
+    image_paths = glob(os.path.join(TEST_DIR, "*.jpg"))
+    if not image_paths:
+        print("No images found in test directory.")
+        return
+        
+    print("\nStarting Pipeline Test on Unseen Images.")
     print("Press any key for next image, 'q' to quit.\n")
 
-    for i, row in df.iterrows():
+    for i, path in enumerate(image_paths):
         # 1. Extract Image
-        img_data = row.get('pixel_values') or row.get('image')
-        if isinstance(img_data, dict):
-            raw = img_data.get('bytes')
-            pil_img = Image.open(io.BytesIO(raw)).convert('RGB')
-        else:
-            pil_img = Image.fromarray(np.array(img_data)).convert('RGB')
-        
+        pil_img = Image.open(path).convert('RGB')
         frame = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
         
         # 2. Analyze using full pipeline
