@@ -31,6 +31,8 @@ class CameraHandler:
                 time.sleep(1.0) # Warm-up
                 self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
                 self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
+                self.cap.set(cv2.CAP_PROP_FPS, 30)
+                self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
             else:
                 print("Error: Could not open any webcam.")
 

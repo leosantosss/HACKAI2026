@@ -132,8 +132,8 @@ def main():
                     break
 
 
-            # Limit loop rate slightly to save CPU
-            time.sleep(0.01)
+            # Run as fast as hardware allows
+            pass
 
     except KeyboardInterrupt:
         print("\nVizzion: Stopping...")
