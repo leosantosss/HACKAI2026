@@ -82,8 +82,15 @@ def main():
                 elapsed = time.time() - start_time
                 fps = frame_count / elapsed if elapsed > 0 else 0
                 
-                # Restore original resolution blending for better quality
-                display_frame = cv2.addWeighted(frame, 0.6, color_mask, 0.4, 0)
+                # A. Brightness Boost (Gamma Correction) for visibility
+                # Highly effective for dark rooms or monitor viewing
+                gamma = 1.2
+                invGamma = 1.0 / gamma
+                table = np.array([((i / 255.0) ** invGamma) * 255 for i in np.arange(0, 256)]).astype("uint8")
+                bright_frame = cv2.LUT(frame, table)
+
+                # B. Blending (Both are BGR now)
+                display_frame = cv2.addWeighted(bright_frame, 0.7, color_mask, 0.3, 0)
                 h_d, w_d = display_frame.shape[:2]
 
                 # 2. Draw raw detections (bboxes) from cache
@@ -111,8 +118,8 @@ def main():
                     cv2.putText(display_frame, msg, (10, 30), 
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-                # Convert RGB back to BGR for OpenCV display
-                cv2.imshow("Vizzion Monitor", cv2.cvtColor(display_frame, cv2.COLOR_RGB2BGR))
+                # Direct Display (No more conversion needed!)
+                cv2.imshow("Vizzion Monitor", display_frame)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
 

@@ -14,8 +14,8 @@ class CameraHandler:
         if HAS_PICAM:
             self.mode = "pi"
             self.picam2 = Picamera2()
-            # Standardizing to (320, 240) as per spec
-            config = self.picam2.create_video_configuration(main={"size": (320, 240)})
+            # Request high-res but processable size (e.g., 640x480) for display quality
+            config = self.picam2.create_video_configuration(main={"size": (640, 480)})
             self.picam2.configure(config)
             self.picam2.start()
         else:
@@ -29,8 +29,9 @@ class CameraHandler:
             if self.cap.isOpened():
                 import time
                 time.sleep(1.0) # Warm-up
-                self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
-                self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
+                # Request 640x480 for a good balance of quality and speed
+                self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+                self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
                 self.cap.set(cv2.CAP_PROP_FPS, 30)
                 self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
             else:
@@ -38,23 +39,23 @@ class CameraHandler:
 
     def capture_frame(self):
         """
-        Captures a frame and returns it as a (240, 320, 3) uint8 RGB numpy array.
-        Note: OpenCV returns BGR, Picamera2 returns RGB by default in capture_array.
+        Captures a frame and returns it as a uint8 BGR numpy array.
+        Standardizing to BGR (OpenCV default) for efficiency in display loop.
         """
         if self.mode == "pi":
-            # picamera2 capture_array is usually RGB
-            return self.picam2.capture_array()
+            # picamera2 capture_array is RGB, convert to BGR for consistency
+            frame = self.picam2.capture_array()
+            return cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         else:
             if not hasattr(self, 'cap') or not self.cap.isOpened():
-                return np.zeros((240, 320, 3), dtype=np.uint8)
+                return np.zeros((480, 640, 3), dtype=np.uint8)
 
             ret, frame = self.cap.read()
             if not ret:
-                return np.zeros((240, 320, 3), dtype=np.uint8)
+                return np.zeros((480, 640, 3), dtype=np.uint8)
             
-            frame_resized = cv2.resize(frame, (320, 240))
-            # Convert BGR to RGB for consistency with Picamera2
-            return cv2.cvtColor(frame_resized, cv2.COLOR_BGR2RGB)
+            # Return raw BGR frame from webcam
+            return frame
 
     def cleanup(self):
         if self.mode == "webcam" and hasattr(self, 'cap'):

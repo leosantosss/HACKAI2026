@@ -35,19 +35,19 @@ class SegFormerDetector:
             'pole':     [k for k, v in self.id2label.items() if 'pole' in v.lower()]
         }
         
-        # Fixed palette: prioritize exact matches
+        # Fixed palette: prioritize exact matches (BGR format for OpenCV)
         self.palette = np.random.randint(60, 230, (len(self.id2label), 3), dtype=np.uint8)
         class_colors = {
-            'sidewalk': (244, 35, 232),  # Pink
-            'road':     (128, 64, 128),  # Purple
-            'curb':     (0, 165, 255),   # Orange
-            'pole':     (192, 128, 128), # Grey-Blue
-            'stair':    (0, 200, 200),   # Teal
-            'person':   (60, 20, 220),   # Red
-            'car':      (0, 0, 142),     # Blue
-            'wall':     (120, 120, 120), # Grey
-            'door':     (150, 100, 50),  # Brown
-            'void':     (200, 150, 200), # Light Violet (For indoor floors)
+            'sidewalk': (232, 35, 244),  # Pink (BGR)
+            'road':     (128, 64, 128),  # Purple (BGR)
+            'curb':     (255, 165, 0),   # Orange (BGR)
+            'pole':     (128, 128, 192), # Grey-Blue (BGR)
+            'stair':    (200, 200, 0),   # Teal (BGR)
+            'person':   (220, 20, 60),   # Red (BGR)
+            'car':      (142, 0, 0),     # Blue (BGR)
+            'wall':     (120, 120, 120), # Grey (BGR)
+            'door':     (50, 100, 150),  # Brown (BGR)
+            'void':     (200, 150, 200), # Light Violet (BGR)
         }
         for cls_id, label in self.id2label.items():
             l_lower = label.lower()
@@ -86,8 +86,9 @@ class SegFormerDetector:
         mask_low = logits.argmax(dim=1)
 
         # 2. Only upsample the final result for the display output
+        # Use 'nearest' for the integer mask to avoid color bleed between classes
         upsampled_mask = torch.nn.functional.interpolate(
-            mask_low.unsqueeze(0).float(), size=(h, w), mode='bilinear', align_corners=False
+            mask_low.unsqueeze(0).float(), size=(h, w), mode='nearest'
         ).squeeze().cpu().numpy().astype(np.uint8)
         
         # Keep internal masks for detection math
