@@ -1,5 +1,6 @@
 import time
 import cv2
+import numpy as np
 from camera import CameraHandler
 from detector import VisionAgent
 from vibration import BuzzerController
