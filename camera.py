@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import config
 
 try:
     from picamera2 import Picamera2

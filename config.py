@@ -3,7 +3,7 @@
 # Hardware
 BUZZER_GPIO_PIN = 18
 BUZZER_FREQUENCY = 2000
-VIDEO_SOURCE = None              # Set to a file path (e.g. "street.mp4") to test on video
+VIDEO_SOURCE = "test_video.mp4"              # Set to a file path (e.g. "street.mp4") to test on video
 
 # Model Files
 SEGFORMER_MODEL = "vizzion-navigation-master"
