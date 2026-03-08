@@ -67,7 +67,10 @@ class SegFormerDetector:
         pil_img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
         
         with torch.inference_mode():
-            inputs = self.processor(images=pil_img, return_tensors="pt")
+            # Speed optimization: Process at smaller resolution
+            inputs = self.processor(images=pil_img, 
+                                    size={"height": config.DETECTION_SIZE, "width": config.DETECTION_SIZE},
+                                    return_tensors="pt")
             inputs = {k: v.to(self.device) for k, v in inputs.items()}
             
             if self.device == "cuda" or self.device == "mps":

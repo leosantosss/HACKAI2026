@@ -15,8 +15,8 @@ CURB_STAIR_MIN_PIXELS = 1000     # Minimum pixel count in hazard zone to trigger
 HAZARD_ZONE_HEIGHT = 0.25        # Bottom % of frame to analyze for curbs/stairs
 
 # Performance (Hackathon Speed Mode)
-FRAME_SKIP = 2                   # Only run AI every N frames (2-3 recommended for Pi)
-DETECTION_SIZE = 256             # Resize AI input to this square size (128-512)
+FRAME_SKIP = 3                   # Run AI every N frames. UI remains smooth.
+DETECTION_SIZE = 256             # Scaled down AI input for Pi CPU.
 
 # Detection zones
 APPROACH_ZONE = 0.35             # center fraction of frame that counts as "in path"
