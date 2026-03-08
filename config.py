@@ -5,26 +5,28 @@ BUZZER_GPIO_PIN = 18
 BUZZER_FREQUENCY = 2000
 
 # Model Files
-MODEL_PROTO = "ssd_mobilenet_v2_coco.pbtxt"
-MODEL_WEIGHTS = "frozen_inference_graph.pb"
+SEGFORMER_MODEL = "vizzion-navigation-master"
 CONFIDENCE_THRESHOLD = 0.5
-SAFETY_CONFIDENCE_THRESHOLD = 0.25 # Lower threshold for objects in the center "path"
+SAFETY_CONFIDENCE_THRESHOLD = 0.25 
+
+# Segmentation Thresholds
+SAFE_PATH_MIN_DENSITY = 0.6      # % of center path that must be "sidewalk/road"
+CURB_STAIR_MIN_PIXELS = 1000     # Minimum pixel count in hazard zone to trigger alert
+HAZARD_ZONE_HEIGHT = 0.25        # Bottom % of frame to analyze for curbs/stairs
 
 # Detection zones
 APPROACH_ZONE = 0.5              # center fraction of frame that counts as "in path"
 
 # Sensitivities
-APPROACH_SENSITIVITY = 0.12      # Slightly more sensitive but smoothed
-APPROACH_TREND_FRAMES = 6        # Increased to 6 for even more stability
-APPROACH_EMA_ALPHA = 0.3         # Smoothing factor (0.0 to 1.0, lower is smoother)
-APPROACH_MIN_SIZE = 0.10         # Catch threats when they are roughly 10% of frame
-OBSTACLE_GROWTH_THRESHOLD = 5    # consecutive frames of growth
-OBSTACLE_MIN_SIZE = 0.10          # minimum bbox area ratio to consider an obstacle
-STAIR_CONFIDENCE_THRESHOLD = 0.6 # edge density (fraction) to trigger stair alert
-CURB_SENSITIVITY = 0.4           # minimum drop size to detect a curb (edge density)
+APPROACH_SENSITIVITY = 0.12      
+APPROACH_TREND_FRAMES = 6        
+APPROACH_EMA_ALPHA = 0.3         
+APPROACH_MIN_SIZE = 0.10         
+OBSTACLE_GROWTH_THRESHOLD = 5    
+OBSTACLE_MIN_SIZE = 0.10          
 
 # Cooldowns (seconds)
-COOLDOWN_APPROACH = .0
+COOLDOWN_APPROACH = 1.0
 COOLDOWN_OBSTACLE = 2.0
 COOLDOWN_STAIR = 3.0
 COOLDOWN_CURB = 2.0
