@@ -82,28 +82,43 @@ def main():
                 elapsed = time.time() - start_time
                 fps = frame_count / elapsed if elapsed > 0 else 0
                 
-                # Overlay Segmentation Mask (cached)
-                display_frame = cv2.addWeighted(frame, 0.6, color_mask, 0.4, 0)
+                # Performance Optimization: Resize for display if frame is large
+                h, w = frame.shape[:2]
+                display_w = 640
+                if w > display_w:
+                    scale = display_w / w
+                    small_frame = cv2.resize(frame, (0,0), fx=scale, fy=scale)
+                    small_mask = cv2.resize(color_mask, (0,0), fx=scale, fy=scale)
+                    # Overlay Segmentation Mask (cached)
+                    display_frame = cv2.addWeighted(small_frame, 0.6, small_mask, 0.4, 0)
+                else:
+                    display_frame = cv2.addWeighted(frame, 0.6, color_mask, 0.4, 0)
                 
+                # Update h, w for scaled drawing
+                h_d, w_d = display_frame.shape[:2]
+                scale_d = w_d / w
+
                 # 2. Draw raw detections (bboxes) from cache
                 for det in raw_detections:
                     left, top, right, bottom = det['bbox']
-                    cv2.rectangle(display_frame, (left, top), (right, bottom), (0, 255, 0), 1)
-                    cv2.putText(display_frame, f"{det['class']} {det['confidence']:.2f}", 
-                                (left, top - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 1)
+                    # Scale bboxes to display size
+                    pt1 = (int(left * scale_d), int(top * scale_d))
+                    pt2 = (int(right * scale_d), int(bottom * scale_d))
+                    cv2.rectangle(display_frame, pt1, pt2, (0, 255, 0), 1)
+                    cv2.putText(display_frame, f"{det['class']}", 
+                                (pt1[0], pt1[1] - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 1)
                 
                 # 3. Draw approach zone (vertical lines)
-                h, w = display_frame.shape[:2]
-                margin = int((1.0 - config.APPROACH_ZONE) / 2 * w)
-                cv2.line(display_frame, (margin, 0), (margin, h), (255, 255, 0), 1, cv2.LINE_AA)
-                cv2.line(display_frame, (w - margin, 0), (w - margin, h), (255, 255, 0), 1, cv2.LINE_AA)
+                margin = int((1.0 - config.APPROACH_ZONE) / 2 * w_d)
+                cv2.line(display_frame, (margin, 0), (margin, h_d), (255, 255, 0), 1, cv2.LINE_AA)
+                cv2.line(display_frame, (w_d - margin, 0), (w_d - margin, h_d), (255, 255, 0), 1, cv2.LINE_AA)
 
                 # 4. Draw Hazard Zone (RED BOX - Bottom Center)
-                hazard_h = int(h * config.HAZARD_ZONE_HEIGHT)
-                cv2.rectangle(display_frame, (margin, h - hazard_h), (w - margin, h), (0, 0, 255), 2)
+                hazard_h = int(h_d * config.HAZARD_ZONE_HEIGHT)
+                cv2.rectangle(display_frame, (margin, h_d - hazard_h), (w_d - margin, h_d), (0, 0, 255), 2)
 
                 # 5. Overlay FPS and Metadata
-                cv2.putText(display_frame, f"FPS: {fps:.1f}", (w - 100, 30), 
+                cv2.putText(display_frame, f"FPS: {fps:.1f}", (w_d - 100, 30), 
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
                 
                 if alert:
