@@ -1,6 +1,11 @@
-# 🚀 VisionAid Deployment Guide (Raspberry Pi 5)
+# 🚀 VisionAid (Raspberry Pi 5)
 
 This guide helps you move the project from your Mac to your Raspberry Pi 5 using an SD card or external SSD.
+
+## Architecture
+<img width="681" height="448" alt="Screenshot 2026-03-07 at 5 39 54 PM" src="https://github.com/user-attachments/assets/4b8aa216-da86-499c-bec5-3d2cf8ec61dd" />
+
+
 
 ## 1. Prepare your OS
 Use **Raspberry Pi Imager** to flash **Raspberry Pi OS (64-bit) Bookworm** onto your card/drive.
