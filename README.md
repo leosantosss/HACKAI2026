@@ -1,5 +1,7 @@
 # Vizzion: AI-Powered Spatial Awareness for the Visually Impaired
 
+![Vizzion Workflow](workflow.png)
+
 Vizzion is a real-time assistive navigation system that translates the visual world into intuitive haptic feedback. By combining state-of-the-art semantic segmentation with intelligent temporal tracking, Vizzion identifies safe paths, structural hazards, and rapidly approaching threats to empower independent mobility.
 
 ## 🚀 Key Features
