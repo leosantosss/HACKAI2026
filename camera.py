@@ -10,13 +10,20 @@ except ImportError:
 class CameraHandler:
     """Wraps picamera2 for frame capture, with OpenCV fallback for Mac/PC."""
     
-    def __init__(self):
-        if HAS_PICAM:
+    def __init__(self, source=None):
+        self.source = source or config.VIDEO_SOURCE
+        
+        if self.source:
+            self.mode = "video"
+            print(f"Initializing Video Source: {self.source}")
+            self.cap = cv2.VideoCapture(self.source)
+            if not self.cap.isOpened():
+                 print(f"Error: Could not open video file {self.source}")
+        elif HAS_PICAM:
             self.mode = "pi"
             self.picam2 = Picamera2()
-            # Request high-res but processable size (e.g., 640x480) for display quality
-            config = self.picam2.create_video_configuration(main={"size": (640, 480)})
-            self.picam2.configure(config)
+            config_pi = self.picam2.create_video_configuration(main={"size": (640, 480)})
+            self.picam2.configure(config_pi)
             self.picam2.start()
         else:
             self.mode = "webcam"
@@ -29,7 +36,6 @@ class CameraHandler:
             if self.cap.isOpened():
                 import time
                 time.sleep(1.0) # Warm-up
-                # Request 640x480 for a good balance of quality and speed
                 self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
                 self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
                 self.cap.set(cv2.CAP_PROP_FPS, 30)
@@ -40,10 +46,8 @@ class CameraHandler:
     def capture_frame(self):
         """
         Captures a frame and returns it as a uint8 BGR numpy array.
-        Standardizing to BGR (OpenCV default) for efficiency in display loop.
         """
         if self.mode == "pi":
-            # picamera2 capture_array is RGB, convert to BGR for consistency
             frame = self.picam2.capture_array()
             return cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         else:
@@ -51,10 +55,15 @@ class CameraHandler:
                 return np.zeros((480, 640, 3), dtype=np.uint8)
 
             ret, frame = self.cap.read()
+            
+            # Loop video if it ends
+            if not ret and self.mode == "video":
+                self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                ret, frame = self.cap.read()
+
             if not ret:
                 return np.zeros((480, 640, 3), dtype=np.uint8)
             
-            # Return raw BGR frame from webcam
             return frame
 
     def cleanup(self):

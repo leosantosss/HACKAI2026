@@ -3,6 +3,7 @@
 # Hardware
 BUZZER_GPIO_PIN = 18
 BUZZER_FREQUENCY = 2000
+VIDEO_SOURCE = None              # Set to a file path (e.g. "street.mp4") to test on video
 
 # Model Files
 SEGFORMER_MODEL = "vizzion-navigation-master"
@@ -15,7 +16,7 @@ CURB_STAIR_MIN_PIXELS = 1000     # Minimum pixel count in hazard zone to trigger
 HAZARD_ZONE_HEIGHT = 0.25        # Bottom % of frame to analyze for curbs/stairs
 
 # Performance (Hackathon Speed Mode)
-FRAME_SKIP = 3                   # Run AI every N frames. UI remains smooth.
+FRAME_SKIP = 4               # Run AI every N frames. UI remains smooth.
 DETECTION_SIZE = 256             # Scaled down AI input for Pi CPU.
 
 # Detection zones
