@@ -79,18 +79,23 @@ class SegFormerDetector:
             else:
                 outputs = self.model(**inputs)
         
-        # 1. Upsample logits to original frame size
+        # 1. Get low-res mask and confidence at native model scale
         logits = outputs.logits
-        upsampled = torch.nn.functional.interpolate(
-            logits, size=(h, w), mode='bilinear', align_corners=False
-        )
+        probs = torch.nn.functional.softmax(logits, dim=1)
+        conf_mask_low, _ = probs.max(dim=1)
+        mask_low = logits.argmax(dim=1)
+
+        # 2. Only upsample the final result for the display output
+        upsampled_mask = torch.nn.functional.interpolate(
+            mask_low.unsqueeze(0).float(), size=(h, w), mode='nearest'
+        ).squeeze(0).cpu().numpy().astype(np.uint8)
         
-        # 2. Get confidence scores
-        probs = torch.nn.functional.softmax(upsampled, dim=1)
-        conf_mask, _ = probs.max(dim=1)
-        conf_mask = conf_mask.squeeze().cpu().numpy()
+        # Keep internal masks for detection math
+        conf_mask = torch.nn.functional.interpolate(
+            conf_mask_low.unsqueeze(0), size=(h, w), mode='bilinear'
+        ).squeeze().cpu().numpy()
         
-        mask = upsampled.argmax(dim=1).squeeze().cpu().numpy().astype(np.uint8)
+        mask = upsampled_mask
         
         detections = []
         # Precise class mapping to avoid substring confusion (like "car" in "caravan")
