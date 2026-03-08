@@ -88,7 +88,7 @@ class SegFormerDetector:
         # 2. Only upsample the final result for the display output
         upsampled_mask = torch.nn.functional.interpolate(
             mask_low.unsqueeze(0).float(), size=(h, w), mode='nearest'
-        ).squeeze(0).cpu().numpy().astype(np.uint8)
+        ).squeeze().cpu().numpy().astype(np.uint8)
         
         # Keep internal masks for detection math
         conf_mask = torch.nn.functional.interpolate(
