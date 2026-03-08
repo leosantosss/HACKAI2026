@@ -92,8 +92,17 @@ def main():
                     cv2.putText(display_frame, f"{det['class']} {det['confidence']:.2f}", 
                                 (left, top - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 1)
                 
-                # 3. Overlay FPS and Metadata
+                # 3. Draw approach zone (vertical lines)
                 h, w = display_frame.shape[:2]
+                margin = int((1.0 - config.APPROACH_ZONE) / 2 * w)
+                cv2.line(display_frame, (margin, 0), (margin, h), (255, 255, 0), 1, cv2.LINE_AA)
+                cv2.line(display_frame, (w - margin, 0), (w - margin, h), (255, 255, 0), 1, cv2.LINE_AA)
+
+                # 4. Draw Hazard Zone (RED BOX - Bottom Center)
+                hazard_h = int(h * config.HAZARD_ZONE_HEIGHT)
+                cv2.rectangle(display_frame, (margin, h - hazard_h), (w - margin, h), (0, 0, 255), 2)
+
+                # 5. Overlay FPS and Metadata
                 cv2.putText(display_frame, f"FPS: {fps:.1f}", (w - 100, 30), 
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
                 
