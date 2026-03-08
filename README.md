@@ -1,4 +1,4 @@
-# 🚀 VisionAid Deployment Guide (Raspberry Pi 5)
+# 🚀 VisionAid (Raspberry Pi 5)
 
 This guide helps you move the project from your Mac to your Raspberry Pi 5 using an SD card or external SSD.
 
