@@ -14,7 +14,7 @@ def get_cooldown(alert_type):
     return 1.0
 
 def main():
-    print("VisionAid: Initializing Refined Pipeline...")
+    print("Vizzion: Initializing Refined Pipeline...")
     try:
         camera = CameraHandler()
         agent = VisionAgent()
@@ -23,7 +23,7 @@ def main():
         print(f"Initialization failed: {e}")
         return
 
-    print("VisionAid: System Ready.")
+    print("Vizzion: System Ready.")
     
     # Cooldown tracking: {alert_type: last_triggered_timestamp}
     cooldowns = {}
@@ -89,7 +89,7 @@ def main():
             time.sleep(0.01)
 
     except KeyboardInterrupt:
-        print("\nVisionAid: Stopping...")
+        print("\nVizzion: Stopping...")
     finally:
         buzzer.cleanup()
         camera.cleanup()

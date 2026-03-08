@@ -1,4 +1,4 @@
-# VisionAid Configuration Constants
+# Vizzion Configuration Constants
 
 # Hardware
 BUZZER_GPIO_PIN = 18

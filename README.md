@@ -1,4 +1,4 @@
-# 🚀 VisionAid (Raspberry Pi 5)
+# 🚀 Vizzion (Raspberry Pi 5)
 
 This guide helps you move the project from your Mac to your Raspberry Pi 5 using an SD card or external SSD.
 
@@ -18,7 +18,7 @@ Since Mac cannot natively write to the Linux (ext4) partition of the SD card, th
 Once the Pi is booted and connected to your Wi-Fi:
 ```bash
 # From your Mac terminal
-scp -r ~/Documents/HACK_AI pi@raspberrypi.local:~/VisionAid
+scp -r ~/Documents/HACK_AI pi@raspberrypi.local:~/Vizzion
 ```
 
 ### Option B: Via GitHub (Best for updates)
@@ -34,23 +34,23 @@ scp -r ~/Documents/HACK_AI pi@raspberrypi.local:~/VisionAid
    ```
 3. On your **Pi**, clone it:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git ~/VisionAid
+   git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git ~/Vizzion
    ```
 
 ### Option C: Via the 'boot' partition (The "Sneakernet" way)
 1. Plug your flashed SD card into your Mac.
 2. Open the volume named `bootfs`.
-3. Create a folder called `VisionAid` and copy all these files into it.
+3. Create a folder called `Vizzion` and copy all these files into it.
 4. Plug the card into your Pi and boot it.
 5. Once logged in, move the folder:
    ```bash
-   mv /boot/firmware/VisionAid ~/VisionAid
+   mv /boot/firmware/Vizzion ~/Vizzion
    ```
 
 ## 3. Setup on the Pi
 Run these commands once you are on the Pi terminal:
 ```bash
-cd ~/VisionAid
+cd ~/Vizzion
 python -m venv .venv --system-site-packages
 source .venv/bin/activate
 pip install ultralytics opencv-python-headless numpy
