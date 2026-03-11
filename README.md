@@ -1,6 +1,6 @@
 # Vizzion: AI-Powered Spatial Awareness for the Visually Impaired
 
-![Vizzion Workflow](workflow.png)
+![Vizzion Workflow](assets/workflow.png)
 
 Vizzion is a real-time assistive navigation system that translates the visual world into intuitive haptic feedback. By combining state-of-the-art semantic segmentation with intelligent temporal tracking, Vizzion identifies safe paths, structural hazards, and rapidly approaching threats to empower independent mobility.
 
@@ -44,17 +44,17 @@ pip install torch transformers opencv-python pillow numpy roboflow
 ```
 
 ### 2. Configure
-Adjust thresholds and performance settings in `config.py`.
+Adjust thresholds and performance settings in `src/config.py`.
 *   `FRAME_SKIP`: Set to `2` or `3` for smoother performance on low-power devices.
 *   `APPROACH_ZONE`: Define the horizontal width of your "safe path."
 
 ### 3. Run
 ```bash
-python main.py
+python src/main.py
 ```
 
 ## 📈 Performance Tip
-If the system feels laggy on your hardware, enable **Hackathon Speed Mode** by adjusting these values in `config.py`:
+If the system feels laggy on your hardware, enable **Hackathon Speed Mode** by adjusting these values in `src/config.py`:
 - `FRAME_SKIP = 2`
 - `SHOW_DISPLAY = False` (for maximum headless performance)
 

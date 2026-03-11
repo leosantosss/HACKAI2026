@@ -1,5 +1,11 @@
+torch
+transformers
 opencv-python-headless
+pillow
 numpy
-# Required for Pi hardware
-# gpiozero
-# picamera2
+roboflow
+pandas
+evaluate
+datasets
+scikit-learn
+pycocotools
