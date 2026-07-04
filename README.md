@@ -1,6 +1,6 @@
 # Vizzion: AI-Powered Spatial Awareness for the Visually Impaired
 
-# WINNER THE TEXAS INSTRUMENTS TRACK AT HACKAI 💻
+# WINNER OF THE TEXAS INSTRUMENTS TRACK AT HACKAI 💻
 
 ![Vizzion Workflow](assets/workflow.png)
 
